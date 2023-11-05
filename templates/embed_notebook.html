@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Embed Jupyter Notebook</title>
+    <script>
+        var timer;
+
+        function formatTime(timeInSeconds) {
+            var hours = Math.floor(timeInSeconds / 3600);
+            var minutes = Math.floor((timeInSeconds % 3600) / 60);
+            var seconds = timeInSeconds % 60;
+            return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        }
+
+        function closeNotebook() {
+            var currentTime = new Date();
+            var endTime = new Date(currentTime);
+            endTime.setMinutes(endTime.getMinutes() + 2);  // Set a 2-minute limit
+            timer = setInterval(function() {
+                currentTime = new Date();
+                var timeLeftInSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+                var timeLeftFormatted = formatTime(timeLeftInSeconds);
+                document.getElementById('timer').textContent = 'Time Left: ' + timeLeftFormatted;
+
+                if (currentTime >= endTime) {
+                    clearInterval(timer);
+                    document.getElementById('notebook').src = '';  // Close the iframe
+                    document.getElementById('timer').textContent = 'Time Expired';
+                    document.getElementById('saveButton').style.display = 'none';  // Hide the "Save" button
+                }
+            }, 1000);
+        }
+
+        function saveNotebook() {
+            // Use JavaScript to send a POST request to the Flask route for saving the notebook
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/save_notebook/{{ username }}", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("Notebook saved successfully!");
+                } else {
+                    alert("Failed to save the notebook.");
+                }
+            };
+            xhr.send();
+        }
+
+    </script>
+</head>
+<body onload="closeNotebook()">
+    <h1>My Embedded Jupyter Notebook</h1>
+    <div id="timer">Time Left: 00:02:00</div>
+
+    <iframe id="notebook" src="http://127.0.0.1:8891/notebooks/{{ username }}.ipynb?kernel=python3" width="1000" height="500"></iframe>
+
+    <button id="saveButton" onclick="saveNotebook()">Save</button>
+</body>
+</html>
