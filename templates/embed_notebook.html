@@ -51,8 +51,8 @@
 <body onload="closeNotebook()">
     <h1>My Embedded Jupyter Notebook</h1>
     <div id="timer">Time Left: 00:02:00</div>
+    <iframe id="notebook" src="http://127.0.0.1:8892/notebooks/{{ username }}.ipynb" width="1000" height="500"></iframe>
 
-    <iframe id="notebook" src="http://127.0.0.1:8891/notebooks/{{ username }}.ipynb?kernel=python3" width="1000" height="500"></iframe>
 
     <button id="saveButton" onclick="saveNotebook()">Save</button>
 </body>

@@ -2,12 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>home</title>
+    <title>Home</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        a {
+            display: block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<h1>login authentication system in flask</h1>
-<a href="{{url_for('login')}}"> login page</a><br>
-<a href="{{url_for('register')}}"> register page</a>
-
+<h1>Login Authentication System in Flask</h1>
+<a href="{{url_for('login')}}">Login Page</a>
+<a href="{{url_for('register')}}">Register Page</a>
 </body>
 </html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Completed</title>
+</head>
+<body>
+    <h1>Registration Completed</h1>
+    {% if registration_completed %}
+        <p>Registration completed successfully!</p>
+    {% endif %}
+    <a href="{{ url_for('login') }}">Click here to Log in</a>
+</body>
+</html>

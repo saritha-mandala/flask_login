@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, send_file
+from flask import Flask, render_template, url_for, redirect, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,login_user,LoginManager,login_required,logout_user,current_user
 from flask_wtf import form, FlaskForm
@@ -11,6 +11,8 @@ from nbformat.v4 import new_notebook, new_code_cell
 from flask import make_response
 import os
 import requests
+from flask import request
+from flask_wtf import FlaskForm
 
 
 
@@ -25,9 +27,9 @@ login_manager.init_app(app)
 login_manager.login_view="login"
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
+    with app.app_context():
+        session = db.session
+        return session.query(User).get(int(user_id))
 
 
 class User(db.Model,UserMixin):
@@ -49,93 +51,57 @@ class RegisterForm(FlaskForm):
         existing_user_email = User.query.filter_by(email=email.data).first()
         if existing_user_email:
             raise ValidationError("An account with this email already exists. Please choose a different email.")
-class LoginForm(FlaskForm):
-    username=StringField(validators=[InputRequired(),Length(min=4,max=20)],
-                         render_kw={"placeholder":"Username"})
-    password = PasswordField(validators=[InputRequired(),Length(min=4,max=20)],
-                             render_kw={"placeholder":"Password"})
-    submit=SubmitField("Login")
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-# @app.route('/login',methods=['GET','POST'])
-# def login():
-#     form= LoginForm()
-#     if form.validate_on_submit():
-#         user=User.query.filter_by(username=form.username.data).first()
-#         if user:
-#             if bcrypt.check_password_hash(user.password,form.password.data):
-#                 login_user(user)
-#                 return redirect(url_for('embed_notebook', username=current_user.username))
-#     return render_template('login.html',form=form)
 
 
-
-
-@app.route('/dashboard',methods=['GET','POST'])
-@login_required
-def dashboard():
-    return render_template(('dashboard.html'))
-# @app.route('/embed_notebook/<username>')
-# @login_required  # This route requires the user to be logged in
-# def embed_notebook(username):
-#     return render_template('embed_notebook.html', username=username)
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-# @app.route('/register',methods=['GET','POST'])
-# def register():
-#     form=RegisterForm()
-#     if form.validate_on_submit():
-#         hashed_password = bcrypt.generate_password_hash(form.password.data)
-#         new_user=User(username=form.username.data,password=hashed_password)
-#         db.session.add(new_user)
-#         db.session.commit()
-#     return render_template('register.html',form=form)
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        email = form.email.data  # Get the provided email
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-
-        # Use the email as the username and store it in the 'username' field
-        new_user = User(email=email, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-
-    return render_template('register.html', form=form)
-
-
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(username=form.username.data).first()
-#         if user and bcrypt.check_password_hash(user.password, form.password.data):
-#             login_user(user)
-#
-#             # Retrieve the username of the logged-in user
-#             username = current_user.username
-#
-#             # Create a new notebook and save it in the user's directory
-#             create_notebook_for_user(username)
-#
-#             return redirect(url_for('embed_notebook', username=username))
-#
-#     return render_template('login.html', form=form)
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Length(min=4, max=50)],
                        render_kw={"placeholder": "Email"})  # Add an 'email' field
     password = PasswordField(validators=[InputRequired(), Length(min=4, max=20)],
                             render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
+@app.route('/')
+def home():
+    return render_template('home.html')
 
-# Update the login route to use the email for username
+@app.route('/dashboard',methods=['GET','POST'])
+@login_required
+def dashboard():
+    return render_template(('dashboard.html'))
+
+from flask import flash
+
+# ...
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+
+    # Check if the form is submitted and the request method is POST
+    if form.is_submitted() and request.method == 'POST':
+        email = form.email.data
+
+        # Check if an account with this email already exists
+        existing_user_email = User.query.filter_by(email=email).first()
+
+        if existing_user_email:
+            flash("An account with this email already exists. Please choose a different email.", "error")
+            return redirect(url_for('already_registered'))
+
+    # If the form is not submitted or the email is unique, proceed with form validation
+    if form.validate_on_submit():
+        # Create a new user with the provided email and hashed password
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(email=form.email.data, password=hashed_password)
+
+        # Add the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("Registration completed successfully.", "success")
+        return redirect(url_for('registration_completed'))
+
+    return render_template('register.html', form=form)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -144,7 +110,7 @@ def login():
          # Extract the username from the email
 
         user = User.query.filter_by(email=email).first()
-        username = email.split('@')[0]
+
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
 
@@ -176,7 +142,7 @@ def create_notebook_for_user(username):
     # Save the notebook to the specified path
     with open(notebook_path, 'w', encoding='utf-8') as f:
         nbformat.write(nb, f)
-# Update the /embed_notebook route
+
 @app.route('/embed_notebook/<username>')
 @login_required
 def embed_notebook(username):
@@ -202,9 +168,11 @@ def serve_notebook(username):
     response.headers["Content-Disposition"] = f"attachment; filename={username}.ipynb"
     return response
 
-@app.route('/save_notebook/<username>', methods=['POST'])
+
+
+@app.route('/save_notebook/<username>', methods=['PUT', 'POST'])
 def save_notebook(username):
-    notebook_server_url = "http://127.0.0.1:8891"
+    notebook_server_url = "http://127.0.0.1:8892"
     notebook_path = f"/notebooks/{username}.ipynb"
     save_url = f"{notebook_server_url}/api/contents{notebook_path}"
 
@@ -232,14 +200,37 @@ def save_notebook(username):
         },
     }
 
-    response = requests.put(save_url, json=params)
+    # Use the appropriate method based on the request
+    if request.method == 'PUT':
+        response = requests.put(save_url, json=params)
+    elif request.method == 'POST':
+        response = requests.post(save_url, json=params)
+    else:
+        return "Unsupported method", 405
 
     if response.status_code == 201:
         return "Notebook saved successfully."
     else:
-        return "Failed to save the notebook."
+        return f"Failed to save the notebook. Status: {response.status_code}"
 
 
+
+@app.route('/registration_completed')
+def registration_completed():
+    registration_completed = True
+    return render_template('registration_completed.html', registration_completed=registration_completed)
+
+
+@app.route('/already_registered')
+def already_registered():
+    already_registered = True
+    return render_template('already_registered.html', already_registered=already_registered)
+
+
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0d790b60-7984-4a47-8280-da185ceedba1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../app.py" beforeDir="false" afterPath="$PROJECT_DIR$/../app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mynewdata.db" beforeDir="false" afterPath="$PROJECT_DIR$/../mynewdata.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../templates/embed_notebook.html" beforeDir="false" afterPath="$PROJECT_DIR$/../templates/embed_notebook.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/../templates/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/../templates/register.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2XtABrPotxC9tO9uaCyZ4bhQSor" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/saritha.mandala/Desktop/inheritance_django/flask_jupyter&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0d790b60-7984-4a47-8280-da185ceedba1" name="Changes" comment="" />
+      <created>1699437878814</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1699437878814</updated>
+      <workItem from="1699439501446" duration="15000" />
+      <workItem from="1699609851854" duration="20000" />
+      <workItem from="1700048042304" duration="5000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
