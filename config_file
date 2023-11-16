@@ -35,3 +35,5 @@ c.NotebookApp.extra_static_paths = [r'C:\Users\saritha.mandala\AppData\Roaming\j
 with this code and save it into C:\Users\saritha.mandala\AppData\Roaming\jupyter here
 4. run this command on terminal
 jupyter notebook --ip=0.0.0.0 --port=8892
+jupyter notebook --notebook-dir=C:\Users\saritha.mandala\Desktop\flask_login\notebooks --ip=0.0.0.0 --port=8892
+

@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
     <!-- Your head content here -->
+    <style>
+        .register{
+        width: 100vw;
+        display: grid;
+        place-items: center;
+        }
+    </style>
 </head>
 <body>
 {% with messages = get_flashed_messages() %}
@@ -15,12 +22,15 @@
 {% endwith %}
 
 <h1>Register</h1>
+<div class="register">
+
 <form method="POST" action="">
     {{ form.hidden_tag() }}
     <label for="email">{{ form.email.label }}</label>
     <input type="text" id="email" name="email" value="{{ form.email.data|default('') }}">
     <br>
     <label for="password">{{ form.password.label }}</label>
+    <br>
     {{ form.password }}
     <br>
     {{ form.submit }}
@@ -28,5 +38,7 @@
 
 
 <a href="{{ url_for('login') }}">Click here to Log in</a>
+    </div>
+
 </body>
 </html>

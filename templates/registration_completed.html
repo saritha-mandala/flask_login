@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Completed</title>
 </head>
 <body>
     <h1>Registration Completed</h1>
-    {% if registration_completed %}
-        <p>Registration completed successfully!</p>
-    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <p>Thank you for registering!</p>
     <a href="{{ url_for('login') }}">Click here to Log in</a>
+    <!-- Your additional content here -->
 </body>
 </html>
+
