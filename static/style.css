@@ -1,0 +1,62 @@
+.submit_btn {
+background-color: green;
+width: 80px;
+height: 35px;
+border-radius: 5px;
+color: white;
+font-size: 15px;
+border: 1px solid white;
+}
+
+.submit_btn[disabled] {
+    background-color: light-green;
+    color: gray;
+}
+
+.form-footer {
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+justify-content: flex-start;
+}
+
+.footer-quote {
+display: flex;
+align-items: center;
+justify-content: flex-start;
+}
+.footer-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.notebook {
+    width: 90vw;
+    max-width: 90vw;
+    min-width: 90vw;
+    margin: 0 5vw;
+}
+
+.heading {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.footer-logo {
+background: -webkit-linear-gradient(#7DC142, #8DD7F7, #009FDB, #07456B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.timer {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: black;
+    text-align: right;
+}

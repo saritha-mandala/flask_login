@@ -1,0 +1,74 @@
+body {
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+}
+.col-right {
+    width: 450px;
+    height: 450px;
+    text-align: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15rem;
+}
+
+.container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+}
+
+.col-left {
+    width: 60%;
+    clip-path: polygon(0 0, 0% 100%, 100% 0);
+    /* background-color: #009FDB;
+     */
+    /* text-align: center; */
+    background-image: url('./otsi-background.png');
+    color: white;
+    padding-top: 4rem;
+}
+
+.col-text {
+    margin-left: 1rem;
+}
+
+.col-text h2 {
+    font-size: 3rem;
+}
+
+.col-text p {
+    font-size: 2rem;
+}
+
+.col-logo img {
+    width: 140px;
+    position: absolute;
+    bottom: 120px;
+    left: 10px;
+}
+
+
+input {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    border: 1px solid black;
+    height: 45px;
+}
+
+#submit {
+    color: #009FDB;
+    border: 2px solid #009FDB;
+    font-size: 1.5rem;
+}
+
+.heading {
+    font-size: 2rem;
+}

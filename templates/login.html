@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href="{{url_for('static', filename = 'login.css')}}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="col-left">
+            <div class="col-text">
+                <h2>Welcome!</h2>
+                <p>To Embeded Jupyter Notebook</p>
+            </div>
+            <div class="col-logo">
+                <img src="../static/otsi-logo.png" alt="otsi">
+            </div>
+        </div>
+        <div class="col-right">
+            <h3 class="heading">Login Page</h3>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                {{ form.email }}
+                <br>
+                {{ form.password }}
+                <br>
+                {{ form.submit }}
+            </form>
+            <p>Not a User ? <a href="#">Register.</a> </p>
+        </div>
+    </div>
+</body>
+
+</html>

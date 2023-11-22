@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Already Registered</title>
+</head>
+<body>
+    <h1>Already Registered</h1>
+    {% if already_registered %}
+        <p>An account with this email already exists. Please choose a different email.</p>
+    {% endif %}
+    <a href="{{ url_for('login') }}">Click here to Log in</a>
+</body>
+</html>
+

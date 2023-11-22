@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Embed Jupyter Notebook</title>
+    <style>
+        .navbar-collapse {
+            display: none !important;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        var timer;
+        var submitButtonVisible = false;
+
+        function formatTime(timeInSeconds) {
+            var hours = Math.floor(timeInSeconds / 3600);
+            var minutes = Math.floor((timeInSeconds % 3600) / 60);
+            var seconds = timeInSeconds % 60;
+            return (
+                (hours < 10 ? "0" : "") +
+                hours +
+                ":" +
+                (minutes < 10 ? "0" : "") +
+                minutes +
+                ":" +
+                (seconds < 10 ? "0" : "") +
+                seconds
+            );
+        }
+
+        function closeNotebook() {
+            var currentTime = new Date();
+            var endTime = new Date(currentTime);
+            endTime.setMinutes(endTime.getMinutes() + 1); // Set a 2-minute limit
+            timer = setInterval(function () {
+                currentTime = new Date();
+                var timeLeftInSeconds = Math.max(
+                    0,
+                    Math.floor((endTime - currentTime) / 1000)
+                );
+                var timeLeftFormatted = formatTime(timeLeftInSeconds);
+                document.getElementById("timer").textContent =
+                    "Time Left: " + timeLeftFormatted;
+
+                if (currentTime >= endTime) {
+                    clearInterval(timer);
+                    document.getElementById("notebook").src = ""; // Close the iframe
+                    document.getElementById("timer").textContent = "Time Expired";
+                    submitButtonVisible = true;
+                    showSubmitButton();
+                }
+            }, 1000);
+        }
+
+        function showSubmitButton() {
+            if (submitButtonVisible) {
+                document.getElementById("submitButton").style.display = "block";
+            }
+        }
+
+        function submitNotebook() {
+            // Perform actions when the user submits the notebook
+            alert("Submitting the notebook...");
+
+            // Send an AJAX request to save the notebook on the server
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/save_notebook/{{ username }}", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.status === "success") {
+                        alert(response.message);
+                        // Optionally, redirect the user to another page after submission
+                        window.location.href = "/submission-success";
+                    } else {
+                        alert("Failed to save the notebook.");
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify({ content: getNotebookContent() }));
+        }
+
+        function getNotebookContent() {
+            // This function should return the current content of the notebook
+            // You may need to modify it based on your implementation
+            var iframe = document.getElementById("notebook");
+            var content = iframe.contentDocument.documentElement.outerHTML;
+            return content;
+        }
+
+        function enableSubmit() {
+            var submit = document.querySelector("#submitButton")
+            submit.disabled = ! submit.disabled
+        }
+    </script>
+    <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
+</head>
+
+<body onload="closeNotebook()">
+<h3 class="heading">Hi, Welcome to the Embedded Jupyter Notebook</h3>
+    <div id="timer" class="timer">Time Left: 00:00:00</div>
+    <iframe
+        id="notebook"
+        class="notebook"
+        src="http://10.80.2.117:8892/notebooks/{{ username }}.ipynb??kernel_name=python3"
+        height="600"
+
+    ></iframe>
+    <div class="form-footer">
+    <div class="footer-quote">
+            <input type="checkbox" onclick="enableSubmit()" />
+            <p>Are You Sure you want to submit & logout ?</p>
+    </div>
+        <div class="footer-body">
+    <button
+        id="submitButton"
+        class="submit_btn"
+        disabled="true"
+        onclick="submitNotebook();"
+    >
+        Submit
+    </button>
+            <b class="footer-logo">OTSI</b>
+        </div>
+    </div>
+</body>
+
+</html>

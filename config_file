@@ -1,0 +1,39 @@
+1.jupyter notebook --generate-config
+after this command config file will be created in in this location
+C:\Users\saritha.mandala\.jupyter with this name jupyter_notebook_config.py
+2.open this file add few lines of code
+
+# set a known, fixed port for server access
+c.NotebookApp.port = 8892
+
+## The number of additional ports to try if the specified port is not available.
+c.NotebookApp.port_retries = 5
+
+## Shut down the server after N seconds with no kernels or terminals running …
+c.NotebookApp.shutdown_no_activity_timeout = 1200
+
+## Supply overrides for the tornado.web.Application that the Jupyter notebook
+#  uses.
+c.NotebookApp.tornado_settings = {
+ "headers": {
+     "Content-Security-Policy": "frame-ancestors * 'self'; report-uri /api/security/csp-report"
+    }
+  }
+c.NotebookApp.extra_static_paths = [r'C:\Users\saritha.mandala\AppData\Roaming\jupyter\custom']
+
+
+3.create custom.css file
+/* Hide the left sidebar */
+#jp-left-stack {
+    display: none !important;
+}
+
+/* Expand the notebook to full width */
+#jp-main-content {
+    margin-left: 0 !important;
+}
+with this code and save it into C:\Users\saritha.mandala\AppData\Roaming\jupyter here
+4. run this command on terminal
+jupyter notebook --ip=0.0.0.0 --port=8892
+jupyter notebook --notebook-dir=C:\Users\murali.chittoji\Desktop\flask_login-test\notebooks --ip=0.0.0.0 --port=8892
+
