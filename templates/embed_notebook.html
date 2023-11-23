@@ -2,8 +2,27 @@
 <html>
 <head>
     <title>Embed Jupyter Notebook</title>
+
     <script>
         var timer;
+        var currentUserRole = "{{ current_user.role }}" || "user";
+
+        // Function to hide menus based on user role
+        function hideMenusBasedOnRole() {
+            if (currentUserRole === "user") {
+                // Hide the file, edit, settings, and help menus
+                document.getElementById('file_menu').style.display = 'none';
+                document.getElementById('edit_menu').style.display = 'none';
+                document.getElementById('view_menu').style.display = 'none';
+                document.getElementById('insert_menu').style.display = 'none';
+                document.getElementById('cell_menu').style.display = 'none';
+                document.getElementById('kernel_menu').style.display = 'none';
+                document.getElementById('help_menu').style.display = 'none';
+            }
+        }
+
+        // Call the function when the document is ready
+        document.addEventListener("DOMContentLoaded", hideMenusBasedOnRole);
 
         function formatTime(timeInSeconds) {
             var hours = Math.floor(timeInSeconds / 3600);
@@ -15,7 +34,7 @@
         function closeNotebook() {
             var currentTime = new Date();
             var endTime = new Date(currentTime);
-            endTime.setMinutes(endTime.getMinutes() + 2);  // Set a 2-minute limit
+            endTime.setMinutes(endTime.getMinutes() + 5);  // Set a 2-minute limit
             timer = setInterval(function() {
                 currentTime = new Date();
                 var timeLeftInSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
@@ -32,28 +51,79 @@
         }
 
         function saveNotebook() {
-            // Use JavaScript to send a POST request to the Flask route for saving the notebook
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/save_notebook/{{ username }}", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
+        // Fetch the notebook content from the embedded iframe
+        var notebookContent = document.getElementById('notebook').contentWindow.getContent();
+
+        // Prepare the data to be sent in the request payload
+        var requestData = {
+            "path": "/notebooks/{{ username }}.ipynb",
+            "type": "notebook",
+            "format": "json",
+            "content": {
+                "name": "{{ username }}.ipynb",
+                "path": "/notebooks/{{ username }}.ipynb",
+                "format": "json",
+                "type": "notebook",
+                "content": notebookContent,  // Include the notebook content here
+                "writable": true,
+                "mimetype": null,
+                "format": "json",
+                "type": "notebook"
+            }
+        };
+
+        // Use JavaScript to send a POST request to the Flask route for saving the notebook
+        var xhr = new XMLHttpRequest();
+        var username = "{{ username }}";  // Replace with the actual username
+        xhr.open("POST", "/save_notebook/" + username, true);
+        xhr.setRequestHeader("Content-Type", "application/json");  // Use application/json content type
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
                     alert("Notebook saved successfully!");
                 } else {
-                    alert("Failed to save the notebook.");
+                    alert("Failed to save the notebook. Status: " + xhr.status);
                 }
-            };
-            xhr.send();
-        }
+            }
+        };
+
+        // Send the JSON object as the request payload
+        xhr.send(JSON.stringify(requestData));
+    }
 
     </script>
 </head>
 <body onload="closeNotebook()">
     <h1>My Embedded Jupyter Notebook</h1>
     <div id="timer">Time Left: 00:02:00</div>
-    <iframe id="notebook" src="http://127.0.0.1:8892/notebooks/{{ username }}.ipynb?kernel=python3" width="1000" height="500"></iframe>
-
+    <iframe id="notebook" src="http://10.80.1.111:8892/notebooks/{{ username }}.ipynb" width="1000" height="500"></iframe>
 
     <button id="saveButton" onclick="saveNotebook()">Save</button>
+
+    <script>
+        // Function to hide menus based on user role
+        function hideMenusBasedOnRole() {
+            var currentUserRole = "{{ current_user.role }}" || "user";
+
+            if (currentUserRole === "user") {
+                // Use Jupyter Notebook API to hide menus
+                var menuBar = document.getElementById('menubar-container');
+                if (menuBar) {
+                    // Hide the File menu
+                    var fileMenu = menuBar.querySelector('.navbar-nav .pull-right #file_menu');
+                    if (fileMenu) {
+                        fileMenu.style.display = 'none';
+                    }
+
+                    // You can similarly hide other menus as needed
+                }
+            }
+        }
+
+        // Call the function when the document is ready
+        document.addEventListener("DOMContentLoaded", hideMenusBasedOnRole);
+
+    </script>
+
 </body>
 </html>

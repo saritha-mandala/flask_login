@@ -1,8 +1,8 @@
+<!-- user_register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Your head content here -->
-    <style>
+<style>
         .register {
             width: 100vw;
             display: grid;
@@ -25,19 +25,11 @@
     </style>
 </head>
 <body>
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class="flash-messages">
-      {% for message in messages %}
-        <li class="flash-message">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+    {% with messages = get_flashed_messages() %}
+        <!-- Flash messages display -->
+    {% endwith %}
 
-<h1>Register</h1>
-<div class="register">
-
+    <h1>User Registration</h1>
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <label for="email">{{ form.email.label }}</label>
@@ -51,7 +43,5 @@
     </form>
 
     <a href="{{ url_for('login') }}">Click here to Log in</a>
-</div>
-
 </body>
 </html>

@@ -49,18 +49,31 @@ class User(db.Model, UserMixin):
 with app.app_context():
     # Access Flask-SQLAlchemy within the application context
     db.create_all()
-
-class RegisterForm(FlaskForm):
+class AdminRegisterForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Length(min=4, max=50)],
                        render_kw={"placeholder": "Email"})
     password = PasswordField(validators=[InputRequired(), Length(min=4, max=20)],
                             render_kw={"placeholder": "Password"})
-    submit = SubmitField("Register")
+    submit = SubmitField("Register as Admin")
 
     def validate_email(self, email):
         existing_user_email = User.query.filter_by(email=email.data).first()
         if existing_user_email:
             raise ValidationError("An account with this email already exists. Please choose a different email.")
+
+
+class UserRegisterForm(FlaskForm):
+    email = StringField(validators=[InputRequired(), Length(min=4, max=50)],
+                       render_kw={"placeholder": "Email"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=20)],
+                            render_kw={"placeholder": "Password"})
+    submit = SubmitField("Register as User")
+
+    def validate_email(self, email):
+        existing_user_email = User.query.filter_by(email=email.data).first()
+        if existing_user_email:
+            raise ValidationError("An account with this email already exists. Please choose a different email.")
+
 
 class LoginForm(FlaskForm):
     email = StringField(validators=[InputRequired(), Length(min=4, max=50)],
@@ -72,6 +85,9 @@ class LoginForm(FlaskForm):
 @app.route('/')
 def home():
     return render_template('home.html')
+@app.route('/user_home')
+def user_home():
+    return render_template('user_home.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -80,62 +96,6 @@ def dashboard():
 
 
 
-
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     form = RegisterForm()
-#
-#     if form.validate_on_submit():
-#         email = form.email.data
-#
-#         # Check if an account with this email already exists
-#         user_exists = db.session.query(exists().where(User.email == email)).scalar()
-#
-#         if user_exists:
-#             flash("An account with this email already exists. Please choose a different email.", "error")
-#             return redirect(url_for('already_registered'))
-#         else:
-#             # Create a new user with the provided email and hashed password
-#             hashed_password = bcrypt.generate_password_hash(form.password.data)
-#             new_user = User(email=email, password=hashed_password)
-#
-#             # Add the new user to the database
-#             db.session.add(new_user)
-#             db.session.commit()
-#
-#             flash("Registration completed successfully.", "success")
-#             return redirect(url_for('registration_completed'))
-#
-#     return render_template('register.html', form=form)
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-
-    # Check if the form is submitted and the request method is POST
-    if form.is_submitted() and request.method == 'POST':
-        email = form.email.data
-
-        # Check if an account with this email already exists
-        existing_user_email = User.query.filter_by(email=email).first()
-
-        if existing_user_email:
-            flash("An account with this email already exists. Please choose a different email.", "error")
-            return redirect(url_for('already_registered'))
-
-    # If the form is not submitted or the email is unique, proceed with form validation
-    if form.validate_on_submit():
-        # Create a new user with the provided email and hashed password
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(email=form.email.data, password=hashed_password)
-
-        # Add the new user to the database
-        db.session.add(new_user)
-        db.session.commit()
-
-        flash("Registration completed successfully.", "success")
-        return redirect(url_for('registration_completed'))
-
-    return render_template('register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -184,7 +144,7 @@ def serve_notebook(username):
 @app.route('/save_notebook/<username>', methods=['PUT', 'POST'])
 @csrf.exempt  # Exempt this route from CSRF protection
 def save_notebook(username):
-    notebook_server_url = "http://127.0.0.1:8892"
+    notebook_server_url = "http://10.80.1.111:5000"
     notebook_path = f"/notebooks/{username}.ipynb"
     save_url = f"{notebook_server_url}/api/contents{notebook_path}"
 
@@ -227,7 +187,43 @@ def registration_completed():
 def already_registered():
     already_registered = True
     return render_template('already_registered.html', already_registered=already_registered)
+@app.route('/register/admin', methods=['GET', 'POST'])
+def admin_register():
+    form = AdminRegisterForm()
 
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        # You can use a specific password for admin users
+        # For example, 'admin_password_hash' can be a predefined hash for admin users
+        if form.password.data == 'admin_password':
+            hashed_password = 'admin_password_hash'
+
+        new_admin = User(email=form.email.data, password=hashed_password)
+
+        db.session.add(new_admin)
+        db.session.commit()
+
+        flash("Admin registration completed successfully.", "success")
+        return redirect(url_for('registration_completed'))
+
+    return render_template('admin_register.html', form=form)
+
+
+@app.route('/register/user', methods=['GET', 'POST'])
+def user_register():
+    form = UserRegisterForm()
+
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data)
+        new_user = User(email=form.email.data, password=hashed_password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("User registration completed successfully.", "success")
+        return redirect(url_for('registration_completed'))
+
+    return render_template('user_register.html', form=form)
 @login_required
 @app.route('/logout')
 def logout():
