@@ -8,6 +8,7 @@
             display: none !important;
         }
     </style>
+    <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         var timer;
@@ -32,7 +33,8 @@
         function closeNotebook() {
             var currentTime = new Date();
             var endTime = new Date(currentTime);
-            endTime.setMinutes(endTime.getMinutes() + 1); // Set a 2-minute limit
+            endTime.setMinutes(endTime.getMinutes() + 10); // Set a 1-minute limit
+
             timer = setInterval(function () {
                 currentTime = new Date();
                 var timeLeftInSeconds = Math.max(
@@ -45,7 +47,7 @@
 
                 if (currentTime >= endTime) {
                     clearInterval(timer);
-                    document.getElementById("notebook").src = ""; // Close the iframe
+                    document.getElementById("notebook").style.display = "none"; // Hide the iframe
                     document.getElementById("timer").textContent = "Time Expired";
                     submitButtonVisible = true;
                     showSubmitButton();
@@ -60,69 +62,85 @@
         }
 
         function submitNotebook() {
-            // Perform actions when the user submits the notebook
-            alert("Submitting the notebook...");
+            // Stop the timer
+            clearInterval(timer);
 
+            // Get the notebook content
+            var content = getNotebookContent();
+
+            // Save the notebook content
+            saveNotebookContent(content);
+            clearInterval(timer); // Stop the timer
+            document.getElementById("timer").textContent = "Notebook Submitted";
+            showSubmitButton(); // Ensure the submit button is visible
+
+            // Navigate to "/submission-success"
+            window.location.href = "/submission-success";
+        }
+
+        function enableSubmit() {
+            var submit = document.querySelector("#submitButton");
+            submit.disabled = !submit.disabled;
+        }
+
+        function getNotebookContent() {
+            var iframe = document.getElementById("notebook");
+
+            // Check if the iframe is not null and has contentDocument
+            if (iframe && iframe.contentDocument) {
+                // Get the content and return it
+                return iframe.contentDocument.documentElement.outerHTML;
+            } else {
+                console.error("Iframe or contentDocument is null.");
+                return null;
+            }
+        }
+
+        function saveNotebookContent(content) {
             // Send an AJAX request to save the notebook on the server
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/save_notebook/{{ username }}", true);
+            xhr.open("POST", "/notebook/{{ username }}", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var response = JSON.parse(xhr.responseText);
                     if (response.status === "success") {
                         alert(response.message);
-                        // Optionally, redirect the user to another page after submission
-                        window.location.href = "/submission-success";
                     } else {
                         alert("Failed to save the notebook.");
                     }
                 }
             };
 
-            xhr.send(JSON.stringify({ content: getNotebookContent() }));
+            xhr.send(JSON.stringify({ content: content }));
         }
 
-        function getNotebookContent() {
-            // This function should return the current content of the notebook
-            // You may need to modify it based on your implementation
-            var iframe = document.getElementById("notebook");
-            var content = iframe.contentDocument.documentElement.outerHTML;
-            return content;
-        }
+        function closeLink() {
+            // Optionally, you can close the link or perform other actions here
+            // For example, you can hide the iframe
+            document.getElementById("notebook").style.display = "none";
 
-        function enableSubmit() {
-            var submit = document.querySelector("#submitButton")
-            submit.disabled = ! submit.disabled
+            // Navigate to "/submission_success"
+            window.location.href = "/submission-success";
         }
     </script>
-    <link href="{{url_for('static', filename = 'style.css')}}" rel="stylesheet">
 </head>
 
 <body onload="closeNotebook()">
-<h3 class="heading">Hi, Welcome to the Embedded Jupyter Notebook</h3>
+    <h3 class="heading">Hi, Welcome to the Embedded Jupyter Notebook</h3>
     <div id="timer" class="timer">Time Left: 00:00:00</div>
-    <iframe
-        id="notebook"
-        class="notebook"
+    <iframe id="notebook" class="notebook"
         src="http://10.80.2.117:8892/notebooks/{{ username }}.ipynb??kernel_name=python3"
-        height="600"
-
-    ></iframe>
+        height="600"></iframe>
     <div class="form-footer">
-    <div class="footer-quote">
+        <div class="footer-quote">
             <input type="checkbox" onclick="enableSubmit()" />
-            <p>Are You Sure you want to submit & logout ?</p>
-    </div>
+            <p>Are you sure you want to submit & logout?</p>
+        </div>
         <div class="footer-body">
-    <button
-        id="submitButton"
-        class="submit_btn"
-        disabled="true"
-        onclick="submitNotebook();"
-    >
-        Submit
-    </button>
+            <button id="submitButton" class="submit_btn" disabled="true" onclick="submitNotebook();">
+                Submit
+            </button>
             <b class="footer-logo">OTSI</b>
         </div>
     </div>

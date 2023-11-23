@@ -212,7 +212,9 @@ def registration_completed():
 def already_registered():
     already_registered = True
     return render_template('already_registered.html', already_registered=already_registered)
-
+@app.route('/submission-success')
+def submission_success():
+    return render_template('submission_success.html')
 @login_required
 @app.route('/logout')
 def logout():

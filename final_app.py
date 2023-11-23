@@ -129,7 +129,7 @@ def login():
 
             # Check if notebook has been submitted
             if notebook_submissions.get(username, False):
-                return render_template('submission_success.html')
+                return render_template('submission-success.html')
 
             return render_template('embed_notebook.html', username=username, existing_content=existing_content)
 
@@ -145,28 +145,8 @@ def create_notebook_for_user(username):
     with open(notebook_path, 'w', encoding='utf-8') as f:
         nbformat.write(nb, f)
 
-@app.route('/submit_notebook/<username>', methods=['POST'])
-# def submit_notebook(username):
-#     notebook_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{username}.ipynb")
-#
-#     try:
-#         content = request.json.get('content', '')
-#
-#         with open(notebook_path, 'w', encoding='utf-8') as f:
-#             f.write(content)
-#
-#         # Set the notebook_submitted status for the current user in the session
-#         session['notebook_submitted'] = True
-#
-#         return jsonify({"status": "success", "message": "Notebook submitted successfully."})
-#     except Exception as e:
-#         print(f"Error submitting notebook: {e}")
-#         return jsonify({"status": "error", "message": "Failed to submit the notebook."})
-
-
-
-
-def submit_notebook(username):
+@app.route('/notebook/<username>', methods=['POST'])
+def save_notebook(username):
     notebook_path = os.path.join(app.config['UPLOAD_FOLDER'], f"{username}.ipynb")
 
     try:
@@ -178,7 +158,7 @@ def submit_notebook(username):
         # Set the notebook_submitted status for the current user in the session
         session['notebook_submitted'] = True
 
-        return redirect(url_for('submission_success'))
+        return render_template('submission_success.html')
 
     except Exception as e:
         print(f"Error submitting notebook: {e}")
@@ -225,7 +205,9 @@ def registration_completed():
 def already_registered():
     already_registered = True
     return render_template('already_registered.html', already_registered=already_registered)
-
+@app.route('/submission-success')
+def submission_success():
+    return render_template('submission_success.html')
 @login_required
 @app.route('/logout')
 # def logout():

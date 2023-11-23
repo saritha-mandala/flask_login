@@ -11,7 +11,7 @@ import requests
 import os
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
-import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -57,7 +57,7 @@ def get_expiration_time(username):
     current_time = datetime.now()
 
     # Create a timedelta object representing the duration of expiration_minutes
-    expiration_duration = datetime.timedelta(minutes=expiration_minutes)
+    expiration_duration = timedelta(minutes=expiration_minutes)
 
     # Add the expiration duration to the current time to get the expiration time
     expiration_time = current_time + expiration_duration
@@ -83,7 +83,7 @@ class LoginForm(FlaskForm):
                             render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
 
-@app.route('/')
+@app.route('/home')
 def home():
     return render_template('home.html')
 
@@ -122,7 +122,7 @@ def register():
 
     return render_template('register.html', form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -146,9 +146,9 @@ def login():
 
             # Check if notebook has been submitted
             if notebook_submissions.get(username, False):
-                return render_template('submission_success.html')
+                return render_template('submission-success.html')
 
-            return render_template('embed_notebook.html', username=username, existing_content=existing_content)
+            return redirect(url_for('embed_notebook', username=username))
 
     return render_template('login.html', form=form)
 
@@ -175,7 +175,7 @@ def submit_notebook(username):
         # Set the notebook_submitted status for the current user in the session
         session['notebook_submitted'] = True
 
-        return jsonify({"status": "success", "message": "Notebook submitted successfully."})
+        return url_for('submission')
     except Exception as e:
         print(f"Error submitting notebook: {e}")
         return jsonify({"status": "error", "message": "Failed to submit the notebook."})
@@ -240,7 +240,9 @@ def registration_completed():
 def already_registered():
     already_registered = True
     return render_template('already_registered.html', already_registered=already_registered)
-
+@app.route('/submission-success')
+def submission_success():
+    return render_template('submission-success.html')
 @login_required
 @app.route('/logout')
 def logout():
